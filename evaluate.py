@@ -109,7 +109,7 @@ if __name__ == '__main__':
         logging.info('\nEvaluating model {}'.format(network))
 
         # Load Network
-        net = torch.load(network)
+        net = torch.load(network,map_location=torch.device('cpu')) #questa parte: ,map_location=torch.device('cpu') l ho aggiunta io perche me l ha detto il debugging altrimenti dava errore perche io non ho il CUDA
 
         results = {'correct': 0, 'failed': 0}
 

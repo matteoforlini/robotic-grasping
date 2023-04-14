@@ -28,10 +28,12 @@ class GraspGenerator:
         self.camera.connect()
 
         # Load camera pose and depth scale (from running calibration)
-        self.cam_pose = np.loadtxt('saved_data/camera_pose.txt', delimiter=' ')
-        self.cam_depth_scale = np.loadtxt('saved_data/camera_depth_scale.txt', delimiter=' ')
-
-        homedir = os.path.join(os.path.expanduser('~'), "grasp-comms")
+        
+        #self.cam_pose = np.loadtxt('saved_data\camera_pose.txt', delimiter=' ')
+        self.cam_pose = np.array([[1, 0, 0, 0],[0, 1, 0, 0],[0, 0, 1, 0],[0, 0, 0, 1]])
+        #self.cam_depth_scale = np.loadtxt('saved_data/camera_depth_scale.txt', delimiter=' ')
+        self.cam_depth_scale =1
+        homedir = os.path.join(os.path.expanduser('~'), "Desktop\prova\grasp-comms")
         self.grasp_request = os.path.join(homedir, "grasp_request.npy")
         self.grasp_available = os.path.join(homedir, "grasp_available.npy")
         self.grasp_pose = os.path.join(homedir, "grasp_pose.npy")
@@ -43,9 +45,10 @@ class GraspGenerator:
 
     def load_model(self):
         print('Loading model... ')
-        self.model = torch.load(self.saved_model_path)
+        self.model = torch.load(self.saved_model_path, map_location=torch.device('cpu'))
         # Get the compute device
-        self.device = get_device(force_cpu=False)
+        #self.device = get_device(force_cpu=True)
+        print('Model loaded.')
 
     def generate(self):
         # Get RGB-D image from camera
@@ -94,13 +97,13 @@ class GraspGenerator:
         np.save(self.grasp_pose, grasp_pose)
 
         if self.fig:
-            plot_grasp(fig=self.fig, rgb_img=self.cam_data.get_rgb(rgb, False), grasps=grasps, save=True)
+            plot_grasp(fig=self.fig, rgb_img=self.cam_data.get_rgb(rgb, False), grasps=grasps, save=False)
 
     def run(self):
         while True:
             if np.load(self.grasp_request):
                 self.generate()
-                np.save(self.grasp_request, 0)
+                np.save(self.grasp_request, 1)
                 np.save(self.grasp_available, 1)
             else:
-                time.sleep(0.1)
+                time.sleep(0.01)

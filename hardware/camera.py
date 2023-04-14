@@ -12,7 +12,7 @@ class RealSenseCamera:
                  device_id,
                  width=640,
                  height=480,
-                 fps=6):
+                 fps=30):
         self.device_id = device_id
         self.width = width
         self.height = height
@@ -26,11 +26,34 @@ class RealSenseCamera:
         # Start and configure
         self.pipeline = rs.pipeline()
         config = rs.config()
-        config.enable_device(str(self.device_id))
+        config.enable_device(self.device_id)  #qui prima era cosi str(self.device_id)
         config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.fps)
         config.enable_stream(rs.stream.color, self.width, self.height, rs.format.rgb8, self.fps)
         cfg = self.pipeline.start(config)
+        
+        
+        
+#######################################
+        # # Configure depth and color streams
+        # self.pipeline = rs.pipeline()
+        # config = rs.config()
 
+        # # Get device product line for setting a supporting resolution
+        # pipeline_wrapper = rs.pipeline_wrapper(self.pipeline)
+        # pipeline_profile = config.resolve(pipeline_wrapper)
+        # device = pipeline_profile.get_device()
+        # config.enable_device(camera_id)
+
+        # #config.enable_stream(rs.stream.depth, 424, 240, rs.format.z16, 90)
+        # config.enable_stream(rs.stream.depth, 424, 240, rs.format.z16, 90)
+        # config.enable_stream(rs.stream.color, 424, 240, rs.format.bgr8, 90)
+        
+        # # Start streaming
+        # self.pipeline.start(config)
+        
+#########################à        
+        
+        
         # Determine intrinsics
         rgb_profile = cfg.get_stream(rs.stream.color)
         self.intrinsics = rgb_profile.as_video_stream_profile().get_intrinsics()
@@ -74,7 +97,7 @@ class RealSenseCamera:
 
 
 if __name__ == '__main__':
-    cam = RealSenseCamera(device_id=830112070066)
+    cam = RealSenseCamera(device_id='046122251438')
     cam.connect()
     while True:
         cam.plot_image_bundle()
